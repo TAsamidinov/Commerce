@@ -2,9 +2,21 @@
 
 {% block body %}
     {% if listing %}
-        <h2>Listing: {{ listing.title }}</h2>
-        
+        <h2> Listing: {{ listing.title }}
+            {% if listing.is_active %}
+                <span style="color: green;">(Active)</span>
+            {% else %}
+                <span style="color: red;">(Closed)</span>
+            {% endif %}
+        </h2>
         <br>
+
+        {% if not listing.is_active and listing.winner == request.user %}
+            <p style="color: green;">You won this auction, Congratulation 🥳🥳🥳!</p>
+            <br>
+        {% endif %}
+
+        
 
         <div class="listing-box">
             <div class="listing-image">
@@ -24,19 +36,28 @@
                 </form>
                 <br>
 
-                <strong>Current Bid:</strong> ${{ listing.price }} 
-                <form action="{% url 'close_listing' listing.id %}" method="post">
-                    {% csrf_token %}
-                    <input type="hidden" name="amount">
-                    <button type="submit">Finish Auction</button>
-                </form>
-                <br>
-                
-                <form action="{% url 'bid' listing.id %}" method="post">
-                    {% csrf_token %}
-                    <input type="number" name="amount" placeholder="Enter your Bid" required>
-                    <button type="submit">Place Bid</button>
-                </form>
+                {% if listing.is_active %}
+                    <strong>Current Bid:</strong> ${{ listing.price }} 
+                    <form action="{% url 'close_listing' listing.id %}" method="post">
+                        {% csrf_token %}
+                        <input type="hidden" name="amount">
+                        <button type="submit">Finish Auction</button>
+                    </form>
+                    <br>
+                    
+                    <form action="{% url 'bid' listing.id %}" method="post">
+                        {% csrf_token %}
+                        <input type="number" name="amount" placeholder="Enter your Bid" required>
+                        <button type="submit">Place Bid</button>
+                    </form>
+                {% else %}
+                    <strong>Final Price:</strong> ${{ listing.price }}
+                    {% if listing.winner %}
+                        <p><strong>Winner:</strong> {{ listing.winner }}</p>
+                    {% else %}
+                        <p><strong>No bids were placed.</strong></p>
+                    {% endif %}
+                {% endif %}
             </div>
         </div>
         <br

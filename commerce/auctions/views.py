@@ -9,7 +9,7 @@ from .models import User, Listing, Comment, Bid
 
 def index(request):
     return render(request, "auctions/index.html", {
-        "listings": Listing.objects.filter(is_active=True).all()
+        "listings": Listing.objects.all()
     })
 
 
@@ -166,6 +166,7 @@ def bid(request, listing_id):
 
         bid = Bid(listing=listing, user=request.user, amount=bid_amount)
         bid.save()
+
         listing.price = bid_amount
         listing.save()
 
@@ -194,6 +195,7 @@ def close_listing(request, listing_id):
         })
 
     listing.is_active = False
+    listing.winner = request.user
     listing.save()
 
     return HttpResponseRedirect(reverse("index"))

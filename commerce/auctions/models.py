@@ -24,7 +24,8 @@ class Listing(models.Model):
     category = models.CharField(max_length=50, blank=True)
     image_url = models.URLField(blank=True, null=True)
     is_active = models.BooleanField(default=True)
-  
+    winner = models.ForeignKey(User, related_name='won_listings', null=True, blank=True, on_delete=models.SET_NULL)
+
     def __str__(self):
         return f"{self.id} {self.title} {self.price}  ({self.owner.username})"
 
