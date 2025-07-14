@@ -143,3 +143,34 @@ def like(request, listing_id):
         message = "Added to watchlist."
 
     return HttpResponseRedirect(reverse("listing", args=(listing_id,)))
+
+def bid(request, listing_id):
+    if not request.user.is_authenticated:
+        return render(request, "auctions/login.html", {
+            "message": "You must be logged in to place a bid."
+        })
+
+    try:
+        listing = Listing.objects.get(id=listing_id)
+    except Listing.DoesNotExist:
+        return render(request, "auctions/error.html", {
+            "message": "Listing not found."
+        })
+
+    if request.method == "POST":
+        bid_amount = request.POST["amount"]
+        if not bid_amount or float(bid_amount) <= listing.price:
+            return render(request, "auctions/error.html", {
+                "message": "Bid amount must be greater than the current price."
+            })
+
+        bid = Bid(listing=listing, user=request.user, amount=bid_amount)
+        bid.save()
+        listing.price = bid_amount
+        listing.save()
+
+        return HttpResponseRedirect(reverse("listing", args=(listing_id,)))
+
+    return render(request, "auctions/listing.html", {
+        "listing": listing
+    })

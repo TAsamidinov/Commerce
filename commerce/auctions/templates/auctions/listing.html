@@ -3,22 +3,41 @@
 {% block body %}
     {% if listing %}
         <h2>Listing: {{ listing.title }}</h2>
-        <form action="{% url 'like' listing.id %}" method="post">
-            {% csrf_token %}
-            <input type="hidden" name="like">
-            <button type="submit">
-                {% if user.is_authenticated and listing in user.watchlist.all %}
-                    Remove from Watchlist
-                {% else %}
-                    Add to Watchlist
-                {% endif %}
-            </button>
-        </form>
+        
         <br>
 
-        <div class="listing-details">
-            <img src="{{ listing.image_url }}" alt="Image for {{ listing.title }}" style="max-width: 300px; border-radius: 5px;">
-            <p><strong>Starting Bid:</strong> ${{ listing.price }}</p>
+        <div class="listing-box">
+            <div class="listing-image">
+                <img src="{{ listing.image_url }}" alt="Image for {{ listing.title }}" style="max-width: 300px; border-radius: 5px;">
+            </div>
+            <div class="listing-info">
+                <form action="{% url 'like' listing.id %}" method="post">
+                    {% csrf_token %}
+                    <input type="hidden" name="like">
+                    <button type="submit">
+                        {% if user.is_authenticated and listing in user.watchlist.all %}
+                            Remove from Watchlist
+                        {% else %}
+                            Add to Watchlist
+                        {% endif %}
+                    </button>
+                </form>
+                <br>
+
+                <strong>Current Bid:</strong> ${{ listing.price }} 
+                <br>
+                
+                <form action="{% url 'bid' listing.id %}" method="post">
+                    {% csrf_token %}
+                    <input type="number" name="amount" placeholder="Enter your Bid" required>
+                    <button type="submit">Place Bid</button>
+                </form>
+            </div>
+        </div>
+        <br
+
+
+        <div class="listing">
             <p><strong>Description:</strong> {{ listing.description }}</p>
             <p><strong>Category:</strong> {{ listing.category }}</p>
             <p><strong>Seller:</strong> {{ listing.owner }}</p>
