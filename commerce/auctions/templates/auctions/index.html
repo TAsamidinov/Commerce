@@ -10,14 +10,23 @@
     <h2>Active Listings</h2>
 
     {% for listing in listings %}
-        <div class="listing" style="border-bottom: 1px solid #ccc; padding: 10px 0;">
-            <h3>{{ listing.title }}</h3>
-            <p>Starting Bid: ${{ listing.starting_bid }}</p>
-            <p>Description: {{ listing.description }}</p>
-            <p>Category: {{ listing.category.name }}</p>
-            {% if listing.image_url %}
-                <img src="{{ listing.image_url }}" alt="Image for {{ listing.title }}" style="max-width: 200px;">
-            {% endif %}
+        <div class="listing-box" style="display: flex; align-items: flex-start; gap: 20px; border-bottom: 1px solid #ccc; padding: 10px 0;">
+            
+            <div class="listing-image" style="flex-shrink: 0;">
+                {% if listing.image_url %}
+                    <img src="{{ listing.image_url }}" alt="Image for {{ listing.title }}" style="border-radius: 5px;">
+                {% endif %}
+            </div>
+            
+            <div class="listing-info">
+                <h3>
+                    <a href="{% url 'listing' listing.id %}">{{ listing.title }}</a>
+                </h3>
+                <p><strong>Starting Bid:</strong> ${{ listing.price }}</p>
+                <p><strong>Description:</strong> {{ listing.description }}</p>
+                <p><strong>Category:</strong> {{ listing.category }}</p>
+            </div>
+            
         </div>
     {% empty %}
         <p>No active listings available.</p>

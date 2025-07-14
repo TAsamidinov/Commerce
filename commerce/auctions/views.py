@@ -69,7 +69,8 @@ def new_listing(request):
         title = request.POST["title"]
         description = request.POST["description"]
         price = request.POST["starting_bid"]
-        
+        category = request.POST["category"]
+        image_url = request.POST.get("image_url", "")
         # Here you would typically save the listing to the database
         # For now, we just render a success message
         if not title or not description or not price:
@@ -81,7 +82,8 @@ def new_listing(request):
             description=description,
             price=price,
             owner=request.user,
-            category=request.POST.get("category", "")
+            category=category,
+            image_url=image_url if image_url else None
         )
         listing.save()
 
@@ -91,3 +93,20 @@ def new_listing(request):
         })
     else:
         return render(request, "auctions/new_listing.html")
+
+def listing(request, listing_id):
+    try:
+        listing = Listing.objects.get(id=listing_id)
+    except Listing.DoesNotExist:
+        return render(request, "auctions/error.html", {
+            "message": "Listing not found."
+        })
+
+    comments = listing.comments.all()
+    bids = listing.bids.all()
+
+    return render(request, "auctions/listing.html", {
+        "listing": listing,
+        "comments": comments,
+        "bids": bids
+    })

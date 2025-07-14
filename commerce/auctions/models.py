@@ -11,7 +11,7 @@ class User(AbstractUser):
     is_verified = models.BooleanField(default=False)
 
     def __str__(self):
-        return f"{self.id} {self.name} {self.surname} ({self.username}) {self.email})"
+        return f"{self.id}. {self.username}: {self.name} {self.surname} {self.email}"
 
 class Listing(models.Model):
     title = models.CharField(max_length=255)
@@ -21,7 +21,8 @@ class Listing(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
     owner = models.ForeignKey(User, on_delete=models.CASCADE)
     category = models.CharField(max_length=50, blank=True)
-
+    image_url = models.URLField(blank=True, null=True)
+  
     def __str__(self):
         return f"{self.id} {self.title} {self.price}  ({self.owner.username})"
 
