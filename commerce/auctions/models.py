@@ -9,6 +9,7 @@ class User(AbstractUser):
     address = models.TextField(blank=True)
     date_of_birth = models.DateField(null=True, blank=True)
     is_verified = models.BooleanField(default=False)
+    watchlist = models.ManyToManyField('Listing', related_name='watchers', blank=True)
 
     def __str__(self):
         return f"{self.id}. {self.username}: {self.name} {self.surname} {self.email}"

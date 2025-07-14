@@ -2,16 +2,30 @@
 
 {% block body %}
     {% if listing %}
-    <h2>Listing: {{ listing.title }}</h2>
-        <div class="listing-details">
-        <img src="{{ listing.image_url }}" alt="Image for {{ listing.title }}" style="max-width: 300px; border-radius: 5px;">
-        <p><strong>Starting Bid:</strong> ${{ listing.price }}</p>
-        <p><strong>Description:</strong> {{ listing.description }}</p>
-        <p><strong>Category:</strong> {{ listing.category }}</p>
-        <p><strong>Seller:</strong> {{ listing.owner }}</p>
-        <p><strong>Created At:</strong> {{ listing.created_at }}</p>
-        <p><strong>Last Updated:</strong> {{ listing.updated_at }}</p>
+        <h2>Listing: {{ listing.title }}</h2>
+        <form action="{% url 'like' listing.id %}" method="post">
+            {% csrf_token %}
+            <input type="hidden" name="like">
+            <button type="submit">
+                {% if user.is_authenticated and listing in user.watchlist.all %}
+                    Remove from Watchlist
+                {% else %}
+                    Add to Watchlist
+                {% endif %}
+            </button>
+        </form>
         <br>
+
+        <div class="listing-details">
+            <img src="{{ listing.image_url }}" alt="Image for {{ listing.title }}" style="max-width: 300px; border-radius: 5px;">
+            <p><strong>Starting Bid:</strong> ${{ listing.price }}</p>
+            <p><strong>Description:</strong> {{ listing.description }}</p>
+            <p><strong>Category:</strong> {{ listing.category }}</p>
+            <p><strong>Seller:</strong> {{ listing.owner }}</p>
+            <p><strong>Created At:</strong> {{ listing.created_at }}</p>
+            <p><strong>Last Updated:</strong> {{ listing.updated_at }}</p>
+            <br>
+
             <ul>
                 {% for bid in bids %}
                     <li>
@@ -23,17 +37,20 @@
                     <li>No bids yet.</li>
                 {% endfor %}
             </ul>
-        <br>
-        <p><strong>Comments:</strong></p>
-        <ul>
-            {% for comment in comments %}
-                <li>
-                    <strong>{{ comment.user }}:</strong> {{ comment.content }}
-                    <em>({{ comment.created_at }})</em>
-                </li>
-            {% empty %}
-                <li>No comments yet.</li>
-            {% endfor %}
+            <br>
+
+            <p><strong>Comments:</strong></p>
+            <ul>
+                {% for comment in comments %}
+                    <li>
+                        <strong>{{ comment.user }}:</strong> {{ comment.content }}
+                        <em>({{ comment.created_at }})</em>
+                    </li>
+                {% empty %}
+                    <li>No comments yet.</li>
+                {% endfor %}
+            </ul>
+        </div>
     {% else %}
         <p>No active listings available.</p>
     {% endif %}

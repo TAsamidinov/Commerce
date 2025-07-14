@@ -110,3 +110,36 @@ def listing(request, listing_id):
         "comments": comments,
         "bids": bids
     })
+
+def watchlist(request):
+    if request.user.is_authenticated:
+        watchlist_items = request.user.watchlist.all()
+        return render(request, "auctions/watchlist.html", {
+            "watchlist": watchlist_items
+        })
+    else:
+        return render(request, "auctions/login.html", {
+            "message": "You must be logged in to view your watchlist."
+        })
+
+def like(request, listing_id):
+    if not request.user.is_authenticated:
+        return render(request, "auctions/login.html", {
+            "message": "You must be logged in to like a listing."
+        })
+
+    try:
+        listing = Listing.objects.get(id=listing_id)
+    except Listing.DoesNotExist:
+        return render(request, "auctions/error.html", {
+            "message": "Listing not found."
+        })
+
+    if listing in request.user.watchlist.all():
+        request.user.watchlist.remove(listing)
+        message = "Removed from watchlist."
+    else:
+        request.user.watchlist.add(listing)
+        message = "Added to watchlist."
+
+    return HttpResponseRedirect(reverse("listing", args=(listing_id,)))
