@@ -25,6 +25,11 @@
                 <br>
 
                 <strong>Current Bid:</strong> ${{ listing.price }} 
+                <form action="{% url 'close_listing' listing.id %}" method="post">
+                    {% csrf_token %}
+                    <input type="hidden" name="amount">
+                    <button type="submit">Finish Auction</button>
+                </form>
                 <br>
                 
                 <form action="{% url 'bid' listing.id %}" method="post">

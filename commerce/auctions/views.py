@@ -9,7 +9,7 @@ from .models import User, Listing, Comment, Bid
 
 def index(request):
     return render(request, "auctions/index.html", {
-        "listings": Listing.objects.all()
+        "listings": Listing.objects.filter(is_active=True).all()
     })
 
 
@@ -174,3 +174,26 @@ def bid(request, listing_id):
     return render(request, "auctions/listing.html", {
         "listing": listing
     })
+
+def close_listing(request, listing_id):
+    if not request.user.is_authenticated:
+        return render(request, "auctions/login.html", {
+            "message": "You must be logged in to close a listing."
+        })
+
+    try:
+        listing = Listing.objects.get(id=listing_id)
+    except Listing.DoesNotExist:
+        return render(request, "auctions/error.html", {
+            "message": "Listing not found."
+        })
+
+    if listing.owner != request.user:
+        return render(request, "auctions/error.html", {
+            "message": "You are not the owner of this listing."
+        })
+
+    listing.is_active = False
+    listing.save()
+
+    return HttpResponseRedirect(reverse("index"))
