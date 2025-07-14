@@ -1,7 +1,7 @@
 from django.contrib.auth import authenticate, login, logout
 from django.db import IntegrityError
 from django.http import HttpResponse, HttpResponseRedirect
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.urls import reverse
 
 from .models import User, Listing, Comment, Bid
@@ -195,10 +195,12 @@ def close_listing(request, listing_id):
         })
 
     listing.is_active = False
-    listing.winner = request.user
+    highest_bid = listing.bids.order_by('-amount').first()
+    if highest_bid:
+        listing.winner = highest_bid.user
     listing.save()
 
-    return HttpResponseRedirect(reverse("index"))
+    return redirect("index")
 
 def comment(request, listing_id):
     if not request.user.is_authenticated:
@@ -227,4 +229,29 @@ def comment(request, listing_id):
 
     return render(request, "auctions/listing.html", {
         "listing": listing
+    })
+
+def categories(request):
+    categories = Listing.objects.values_list('category', flat=True).distinct()
+
+    if not categories:
+        return render(request, "auctions/error.html", {
+            "message": "No categories found."
+        })
+
+    return render(request, "auctions/categories.html", {
+        "categories": categories,
+    })
+
+def category_listings(request, category_name):
+    listings = Listing.objects.filter(category=category_name, is_active=True)
+
+    if not listings:
+        return render(request, "auctions/error.html", {
+            "message": f"No listings found in category '{category_name}'."
+        })
+
+    return render(request, "auctions/category_listings.html", {
+        "listings": listings,
+        "category_name": category_name
     })
