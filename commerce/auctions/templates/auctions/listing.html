@@ -50,6 +50,14 @@
                         <input type="number" name="amount" placeholder="Enter your Bid" required>
                         <button type="submit">Place Bid</button>
                     </form>
+                    <br>
+
+                    <form action="{% url 'comment' listing.id %}" method="post">
+                        {% csrf_token %}
+                        
+                        <textarea name="comment" placeholder="Add a comment..." required></textarea>    
+                        <button type="submit">Add Comment</button>
+                    </form>
                 {% else %}
                     <strong>Final Price:</strong> ${{ listing.price }}
                     {% if listing.winner %}

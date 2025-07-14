@@ -199,3 +199,32 @@ def close_listing(request, listing_id):
     listing.save()
 
     return HttpResponseRedirect(reverse("index"))
+
+def comment(request, listing_id):
+    if not request.user.is_authenticated:
+        return render(request, "auctions/login.html", {
+            "message": "You must be logged in to comment."
+        })
+
+    try:
+        listing = Listing.objects.get(id=listing_id)
+    except Listing.DoesNotExist:
+        return render(request, "auctions/error.html", {
+            "message": "Listing not found."
+        })
+
+    if request.method == "POST":
+        content = request.POST["comment"]
+        if not content:
+            return render(request, "auctions/error.html", {
+                "message": "Comment cannot be empty."
+            })
+
+        comment = Comment(listing=listing, user=request.user, content=content)
+        comment.save()
+
+        return HttpResponseRedirect(reverse("listing", args=(listing_id,)))
+
+    return render(request, "auctions/listing.html", {
+        "listing": listing
+    })
